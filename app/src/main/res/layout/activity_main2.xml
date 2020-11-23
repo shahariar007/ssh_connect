@@ -65,6 +65,7 @@
                 android:background="@color/black"
                 android:focusableInTouchMode="true"
                 android:lines="15"
+                android:layout_gravity="bottom"
                 android:scrollbars="vertical"
                 android:textColor="#ffffff"
                 android:textIsSelectable="true" />
@@ -77,6 +78,7 @@
                 android:background="@color/black"
                 android:focusableInTouchMode="true"
                 android:lines="15"
+                android:layout_gravity="bottom"
                 android:scrollbars="vertical"
                 android:textColor="#ffffff"
                 android:textIsSelectable="true" />

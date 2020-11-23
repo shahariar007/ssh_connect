@@ -16,24 +16,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class MainActivity2 extends AppCompatActivity {
     Button rasp4, rasp3;
     public TextView result3, result4;
     AutoCompleteTextView pi4EditText;
-
+    Session mSessionPI4;
+    ChannelExec channel;
+    Session mSessionPI3;
     String item[] = {
             "uptime -p",
             "sudo shutdown now",
             "sudo reboot",
             "sudo /etc/init.d/apache2 restart",
             "sudo /opt/vc/bin/vcgencmd measure_temp",
-            "sudo apt update","sudo apt full-upgrade",
+            "sudo apt update", "sudo apt full-upgrade",
             "sudo vcgencmd get_mem arm && vcgencmd get_mem gpu",
             "ping",
             "sudo netstat -tunlp"
@@ -83,35 +91,76 @@ public class MainActivity2 extends AppCompatActivity {
             String hostname,
             String port, String tag, String command) throws Exception {
 
+        if (mSessionPI4 == null) {
+            JSch jsch = new JSch();
+            mSessionPI4 = jsch.getSession(username, hostname, Integer.parseInt(port));
+            mSessionPI4.setPassword(password);
+            mSessionPI4.setTimeout(1000000);
 
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(username, hostname, Integer.parseInt(port));
-        session.setPassword(password);
-        session.setTimeout(100000);
+            // Avoid asking for key confirmation
+            Properties prop = new Properties();
+            prop.put("StrictHostKeyChecking", "no");
+            prop.put("compression.s2c", "zlib,none");
+            prop.put("compression.c2s", "zlib,none");
+            prop.put("PreferredAuthentications", "password");
+            mSessionPI4.setConfig(prop);
+            mSessionPI4.connect();
+        }
+        channel = (ChannelExec) mSessionPI4.openChannel("exec");
+        channel.setCommand(command);
 
-        // Avoid asking for key confirmation
-        Properties prop = new Properties();
-        prop.put("StrictHostKeyChecking", "no");
-        prop.put("compression.s2c", "zlib,none");
-        prop.put("compression.c2s", "zlib,none");
-        session.setConfig(prop);
-
-        session.connect();
-
-        // SSH Channel
-      //  ChannelExec channelssh = (ChannelExec) session.openChannel("exec");
-        ChannelExec channelssh = (ChannelExec) session.openChannel("exec");
-        channelssh.setInputStream(null);
-        channelssh.setErrStream(System.err);
-        ((ChannelExec) channelssh).setPty(true);
+        channel.setInputStream(null);
+        channel.setErrStream(System.err);
+        ((ChannelExec) channel).setPty(true);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        channelssh.setOutputStream(baos);
+        channel.setOutputStream(baos);
 
-        // Execute command
-        channelssh.setCommand(command);
-        channelssh.connect();
-        Thread.sleep(2000);
-        channelssh.disconnect();
+
+        InputStream commandOutput = channel.getExtInputStream();
+
+        StringBuilder outputBuffer = new StringBuilder();
+        StringBuilder errorBuffer = new StringBuilder();
+
+        InputStream in = channel.getInputStream();
+        InputStream err = channel.getExtInputStream();
+
+        channel.connect();
+        byte[] tmp = new byte[1024];
+        while (true) {
+            while (in.available() > 0) {
+                int i = in.read(tmp, 0, 1024);
+                if (i < 0) break;
+                outputBuffer.append(new String(tmp, 0, i));
+            }
+            while (err.available() > 0) {
+                int i = err.read(tmp, 0, 1024);
+                if (i < 0) break;
+                errorBuffer.append(new String(tmp, 0, i));
+            }
+            if (channel.isClosed()) {
+                if ((in.available() > 0) || (err.available() > 0)) continue;
+                System.out.println("exit-status: " + channel.getExitStatus());
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ee) {
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (tag.equals("PI4")) {
+                        result4.setText(outputBuffer.toString());
+                    } else {
+                        result3.setText(outputBuffer.toString());
+                    }
+
+
+                }
+            });
+        }
+
+        channel.disconnect();
 
         if (tag.equals("PI4")) {
 
@@ -120,7 +169,7 @@ public class MainActivity2 extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    result4.setText(new String(baos.toByteArray()));
+                    result4.setText(outputBuffer.toString());
                     result4.setMovementMethod(new ScrollingMovementMethod());
                     result4.setTextIsSelectable(false);
                     result4.measure(-1, -1);//you can specific other values.
@@ -134,7 +183,174 @@ public class MainActivity2 extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    result3.setText(new String(baos.toByteArray()));
+                    result3.setText(outputBuffer.toString());
+                    result3.setMovementMethod(new ScrollingMovementMethod());
+                    result3.setTextIsSelectable(false);
+                    result3.measure(-1, -1);//you can specific other values.
+                    result3.setTextIsSelectable(true);
+                }
+            });
+        }
+
+
+        return outputBuffer.toString();
+    }
+
+
+    public String executeRemoteCommandShellTest(
+            String username,
+            String password,
+            String hostname,
+            String port, String tag, String command) throws Exception {
+
+        if (mSessionPI4 == null) {
+            JSch jsch = new JSch();
+            mSessionPI4 = jsch.getSession(username, hostname, Integer.parseInt(port));
+            mSessionPI4.setPassword(password);
+            mSessionPI4.setTimeout(1000000);
+
+            // Avoid asking for key confirmation
+            Properties prop = new Properties();
+            prop.put("StrictHostKeyChecking", "no");
+            prop.put("compression.s2c", "zlib,none");
+            prop.put("compression.c2s", "zlib,none");
+            prop.put("PreferredAuthentications", "password");
+            mSessionPI4.setConfig(prop);
+            mSessionPI4.connect();
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ChannelShell channel = (ChannelShell) mSessionPI4.openChannel("shell");
+        ((ChannelShell) channel).setPtyType("dumb");
+        //((ChannelShell)channel).setPty(false);
+        channel.setOutputStream(outputStream,true);
+        PrintStream stream = new PrintStream(channel.getOutputStream());
+        channel.connect();
+
+        stream.println(command);
+        stream.flush();
+        stream.close();
+        Thread.sleep(1000);
+        String x = waitForPrompt(outputStream);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //String df = URLEncoder.encode(outputStream.toString(), "UTF-8");
+                result4.setText(outputStream.toString());
+
+            }
+        });
+        // channel.disconnect();
+        //mSessionPI4.disconnect();
+        return "";
+    }
+
+    static public String waitForPrompt(ByteArrayOutputStream outputStream) throws InterruptedException {
+        int retries = 5;
+        StringBuilder stringBuffer = new StringBuilder();
+        for (int x = 1; x < retries; x++) {
+            Thread.sleep(1000);
+            if (outputStream.toString().indexOf("$") > 0) {
+                System.out.print(outputStream.toString());
+                stringBuffer.append(outputStream.toString());
+                //outputStream.reset();
+                return null;
+            }
+
+        }
+        return outputStream.toString();
+    }
+
+    public String executeRemoteCommandPI3(
+            String username,
+            String password,
+            String hostname,
+            String port, String tag, String command) throws Exception {
+
+        if (mSessionPI3 == null) {
+            JSch jsch = new JSch();
+            mSessionPI3 = jsch.getSession(username, hostname, Integer.parseInt(port));
+            mSessionPI3.setPassword(password);
+            mSessionPI3.setTimeout(1000000);
+
+            Properties prop = new Properties();
+            prop.put("StrictHostKeyChecking", "no");
+            prop.put("compression.s2c", "zlib,none");
+            prop.put("compression.c2s", "zlib,none");
+            mSessionPI3.setConfig(prop);
+            mSessionPI3.connect();
+        }
+
+        ChannelExec channel = (ChannelExec) mSessionPI3.openChannel("exec");
+        channel.setCommand(command);
+
+        InputStream commandOutput = channel.getExtInputStream();
+
+        StringBuilder outputBuffer = new StringBuilder();
+        StringBuilder errorBuffer = new StringBuilder();
+
+        InputStream in = channel.getInputStream();
+        InputStream err = channel.getExtInputStream();
+
+        channel.connect();
+        byte[] tmp = new byte[1024];
+        while (true) {
+            while (in.available() > 0) {
+                int i = in.read(tmp, 0, 1024);
+                if (i < 0) break;
+                outputBuffer.append(new String(tmp, 0, i));
+            }
+            while (err.available() > 0) {
+                int i = err.read(tmp, 0, 1024);
+                if (i < 0) break;
+                errorBuffer.append(new String(tmp, 0, i));
+            }
+            if (channel.isClosed()) {
+                if ((in.available() > 0) || (err.available() > 0)) continue;
+                System.out.println("exit-status: " + channel.getExitStatus());
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ee) {
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (tag.equals("PI4")) {
+                        result4.setText(outputBuffer.toString());
+                    } else {
+                        result3.setText(outputBuffer.toString());
+                    }
+
+
+                }
+            });
+        }
+
+        channel.disconnect();
+
+        if (tag.equals("PI4")) {
+
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    result4.setText(outputBuffer.toString());
+                    result4.setMovementMethod(new ScrollingMovementMethod());
+                    result4.setTextIsSelectable(false);
+                    result4.measure(-1, -1);//you can specific other values.
+                    result4.setTextIsSelectable(true);
+
+                }
+            });
+        } else if (tag.equals("PI3")) {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    result3.setText(outputBuffer.toString());
                     result3.setMovementMethod(new ScrollingMovementMethod());
                     result3.setTextIsSelectable(false);
                     result3.measure(-1, -1);//you can specific other values.
@@ -146,7 +362,7 @@ public class MainActivity2 extends AppCompatActivity {
         }
 
 
-        return baos.toString();
+        return outputBuffer.toString();
     }
 
     public class Tasks extends AsyncTask<String, Void, String> {
@@ -160,7 +376,13 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             try {
-                executeRemoteCommand(strings[0], strings[1], strings[2], strings[3], strings[4], strings[5]);
+                if (strings[4].equals("PI4")) {
+                    //  executeRemoteCommand(strings[0], strings[1], strings[2], strings[3], strings[4], strings[5]);
+                    executeRemoteCommandShellTest(strings[0], strings[1], strings[2], strings[3], strings[4], strings[5]);
+                } else
+                    executeRemoteCommandPI3(strings[0], strings[1], strings[2], strings[3], strings[4], strings[5]);
+
+
             } catch (Exception e) {
 
                 if (strings[4].equals("PI4")) {
@@ -195,25 +417,25 @@ public class MainActivity2 extends AppCompatActivity {
 
                 }
             }
-                return null;
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // dialog = new ProgressDialog(context);
+            //dialog.setMessage("Please Wait....." );
+            // dialog.show();
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (dialog != null) {
+                dialog.dismiss();
             }
 
-            @Override
-            protected void onPreExecute () {
-                super.onPreExecute();
-                dialog = new ProgressDialog(context);
-                dialog.setMessage("Please Wait....." );
-                dialog.show();
-
-            }
-
-            @Override
-            protected void onPostExecute (String s){
-                super.onPostExecute(s);
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-
-            }
         }
     }
+}
