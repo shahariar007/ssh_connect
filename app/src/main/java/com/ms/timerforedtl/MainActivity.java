@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity {
     private static final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
     private static final String TAG = "MainActivity";
-
+   
     int i = 0;
     int j = 0;
     int k = 0;
@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     long tempEnd = 0;
     long finalTime = 0;
     long end = 0;
-
 
     List<Long> longs = new ArrayList<>();
 
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public String stringTime(long times) {
-        return String.format("%02d:%02d:%02d",
+        return String.format(getString(R.string.lala),
                 TimeUnit.MILLISECONDS.toHours(times),
                 TimeUnit.MILLISECONDS.toMinutes(times) -
                         TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(times)), // The change is in this line

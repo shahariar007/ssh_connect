@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PI Control</string>
+    <string name="lala">%02d:%02d:%02d</string>
 </resources>

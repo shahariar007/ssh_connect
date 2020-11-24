@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -15,12 +16,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -35,6 +38,9 @@ public class MainActivity2 extends AppCompatActivity {
     Session mSessionPI4;
     ChannelExec channel;
     Session mSessionPI3;
+    String IP = "102.180.90.144";
+    String PASSWORD = "mortuza";
+    String USERID="pi";
     String item[] = {
             "uptime -p",
             "sudo shutdown now",
@@ -65,7 +71,7 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(pi4EditText.getText().toString()))
-                    new Tasks(MainActivity2.this).execute("pi", "PASSWORD", "URL", "22", "PI4", pi4EditText.getText().toString());
+                    new Tasks(MainActivity2.this).execute(USERID, PASSWORD, IP, "22", "PI4", pi4EditText.getText().toString());
                 else
                     Toast.makeText(MainActivity2.this, "Empty string", Toast.LENGTH_SHORT).show();
             }
@@ -75,7 +81,7 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(pi4EditText.getText().toString()))
-                    new Tasks(MainActivity2.this).execute("pi", "PASSWORD", "URL", "1022", "PI3", pi4EditText.getText().toString());
+                    new Tasks(MainActivity2.this).execute(USERID, PASSWORD, IP, "1022", "PI3", pi4EditText.getText().toString());
                 else
                     Toast.makeText(MainActivity2.this, "Empty string", Toast.LENGTH_SHORT).show();
             }
@@ -221,43 +227,62 @@ public class MainActivity2 extends AppCompatActivity {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ChannelShell channel = (ChannelShell) mSessionPI4.openChannel("shell");
         ((ChannelShell) channel).setPtyType("dumb");
-        //((ChannelShell)channel).setPty(false);
-        channel.setOutputStream(outputStream,true);
+        //((ChannelShell)channel).setPty(true);
+        channel.setOutputStream(outputStream, true);
         PrintStream stream = new PrintStream(channel.getOutputStream());
         channel.connect();
-
         stream.println(command);
         stream.flush();
-        stream.close();
+        //stream.close();
+
+        StringBuilder outputBuffer = new StringBuilder();
+
+        InputStream in = channel.getInputStream();
+        InputStream err = channel.getExtInputStream();
+
         Thread.sleep(1000);
-        String x = waitForPrompt(outputStream);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //String df = URLEncoder.encode(outputStream.toString(), "UTF-8");
-                result4.setText(outputStream.toString());
 
+        byte[] tmp = new byte[1024];
+        int stepCount = 0;
+        while (true) {
+            Log.d("MainActivity2", "in.available()" + in.available());
+
+            while (in.available() > 0) {
+                int i = in.read(tmp, 0, 1024);
+                if (i < 0) break;
+                outputBuffer.append(new String(tmp, 0, i));
+                Log.d("MainActivity2", "available: " + i);
+
+                Log.d("MainActivity2", "executeRemoteCommandShellTest: ");
+                stepCount = 0;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        result4.setText(outputBuffer.toString());
+                    }
+                });
             }
-        });
-        // channel.disconnect();
-        //mSessionPI4.disconnect();
-        return "";
-    }
+            if (channel.isClosed()) {
+                if ((in.available() > 0) || (err.available() > 0)) continue;
+                System.out.println("exit-status: " + channel.getExitStatus());
+                break;
+            }
 
-    static public String waitForPrompt(ByteArrayOutputStream outputStream) throws InterruptedException {
-        int retries = 5;
-        StringBuilder stringBuffer = new StringBuilder();
-        for (int x = 1; x < retries; x++) {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    result4.setText(outputBuffer.toString());
+                }
+            });
             Thread.sleep(1000);
-            if (outputStream.toString().indexOf("$") > 0) {
-                System.out.print(outputStream.toString());
-                stringBuffer.append(outputStream.toString());
-                //outputStream.reset();
-                return null;
+            stepCount++;
+            if (stepCount == 10) {
+                break;
             }
 
         }
-        return outputStream.toString();
+        return "";
     }
 
     public String executeRemoteCommandPI3(
@@ -284,6 +309,7 @@ public class MainActivity2 extends AppCompatActivity {
         channel.setCommand(command);
 
         InputStream commandOutput = channel.getExtInputStream();
+
 
         StringBuilder outputBuffer = new StringBuilder();
         StringBuilder errorBuffer = new StringBuilder();
@@ -325,6 +351,7 @@ public class MainActivity2 extends AppCompatActivity {
 
                 }
             });
+            Log.d("MainActivity2", "executeRemoteCommandPI3: ");
         }
 
         channel.disconnect();
