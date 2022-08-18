@@ -35,6 +35,7 @@ public class MainActivity2 extends AppCompatActivity {
     Session mSessionPI3;
     String IP = "";
     String PASSWORD = "";
+
     String USERID = "pi";
     String item[] = {
             "uptime -p",
