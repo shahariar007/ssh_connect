@@ -1,7 +1,5 @@
 package com.ms.timerforedtl;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -16,31 +14,28 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jcraft.jsch.Channel;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Properties;
 
 public class MainActivity2 extends AppCompatActivity {
-    Button rasp4, rasp3;
+    Button rasp4, rasp3, shutdown;
     public TextView result3, result4;
     AutoCompleteTextView pi4EditText;
     Session mSessionPI4;
     ChannelExec channel;
     Session mSessionPI3;
-    String IP = "102.180.90.144";
-    String PASSWORD = "mortuza";
-    String USERID="pi";
+    String IP = "";
+    String PASSWORD = "";
+    String USERID = "pi";
     String item[] = {
             "uptime -p",
             "sudo shutdown now",
@@ -61,6 +56,7 @@ public class MainActivity2 extends AppCompatActivity {
         rasp3 = findViewById(R.id.rasp3);
         result3 = findViewById(R.id.result3);
         result4 = findViewById(R.id.result4);
+        shutdown = findViewById(R.id.shutdown);
 
 
         pi4EditText = findViewById(R.id.pi4EditText);
@@ -84,6 +80,15 @@ public class MainActivity2 extends AppCompatActivity {
                     new Tasks(MainActivity2.this).execute(USERID, PASSWORD, IP, "1022", "PI3", pi4EditText.getText().toString());
                 else
                     Toast.makeText(MainActivity2.this, "Empty string", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        shutdown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Tasks(MainActivity2.this).execute(USERID, PASSWORD, IP, "22", "PI4", item[1]);
+                new Tasks(MainActivity2.this).execute(USERID, PASSWORD, IP, "1022", "PI3", item[1]);
+
             }
         });
 
