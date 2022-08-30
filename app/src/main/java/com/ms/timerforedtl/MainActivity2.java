@@ -1,16 +1,23 @@
 package com.ms.timerforedtl;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +42,16 @@ public class MainActivity2 extends AppCompatActivity {
     Session mSessionPI3;
     String IP = "";
     String PASSWORD = "";
+    ImageView settings;
 
     String USERID = "pi";
+
+
+    String HOST_KEY = "HOST";
+    String PASSWORD_KEY = "PASSWORD";
+    String USERID_KEY = "USERID";
+
+
     String item[] = {
             "uptime -p",
             "sudo shutdown now",
@@ -58,8 +73,14 @@ public class MainActivity2 extends AppCompatActivity {
         result3 = findViewById(R.id.result3);
         result4 = findViewById(R.id.result4);
         shutdown = findViewById(R.id.shutdown);
-
-
+        settings = findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setup();
+            }
+        });
+        dataSet();
         pi4EditText = findViewById(R.id.pi4EditText);
 
         pi4EditText.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, item));
@@ -470,5 +491,46 @@ public class MainActivity2 extends AppCompatActivity {
             }
 
         }
+    }
+
+    public void setup() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Setup");
+        View v = LayoutInflater.from(this).inflate(R.layout.setup_layout, null, false);
+        alert.setView(v);
+
+        EditText host = v.findViewById(R.id.host);
+        EditText userName = v.findViewById(R.id.userName);
+        EditText password = v.findViewById(R.id.password);
+        host.setText(IP);
+        userName.setText(USERID);
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (!TextUtils.isEmpty(host.getText().toString()) && !TextUtils.isEmpty(userName.getText().toString()) && !TextUtils.isEmpty(password.getText().toString())) {
+                    PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).edit().putString(HOST_KEY, host.getText().toString()).apply();
+                    PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).edit().putString(USERID_KEY, userName.getText().toString()).apply();
+                    PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).edit().putString(PASSWORD_KEY, password.getText().toString()).apply();
+                    dataSet();
+                } else {
+                    Toast.makeText(MainActivity2.this, "Non of Field is Empty", Toast.LENGTH_SHORT).show();
+                }
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+    }
+
+    public void dataSet() {
+        IP = PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).getString(HOST_KEY, "");
+        USERID = PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).getString(USERID_KEY, "");
+        PASSWORD = PreferenceManager.getDefaultSharedPreferences(MainActivity2.this).getString(PASSWORD_KEY, "");
+        Log.d("TAG", "dataSet: " + IP + USERID+PASSWORD);
     }
 }
