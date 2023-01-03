@@ -15,7 +15,7 @@ jobs:
 #        run: chmod +x ./gradlew test
 
       - name: build project
-        run:  ./gradlew assemble
+        run:  chmod +x ./gradlew #./gradlew assemble
 
 #      - name: build release
 #          run: ./gradlew bundleRelease
