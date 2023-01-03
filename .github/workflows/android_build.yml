@@ -14,10 +14,10 @@ jobs:
       - name: Run test
         run: ./gradlew test
 
-#      - name: build project
-#        run: ./gradlew assemble
+      - name: build project
+        run: ./gradlew assemble
 
-      - name: build release
-          run: ./gradlew bundleRelease
+#      - name: build release
+#          run: ./gradlew bundleRelease
 
 
