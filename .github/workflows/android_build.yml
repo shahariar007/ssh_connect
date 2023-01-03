@@ -18,7 +18,7 @@ jobs:
         run:  chmod +x ./gradlew #./gradlew assemble
       - name: Build Release AAB
         id: buildRelease
-        run: chmod +x ./gradlew bundleRelease
+        run: chmod +x ./gradlew
 #      - name: build release
 #          run: ./gradlew bundleRelease
 
