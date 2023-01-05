@@ -21,5 +21,14 @@ jobs:
         run: chmod +x ./gradlew
 #      - name: build release
 #          run: ./gradlew bundleRelease
+      - name: Sign AAB
+        id: sign
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SSH_CONNECT }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.PASSWORD }}
+          keyPassword: ${{ secrets.PASSWORD }}
 
 
