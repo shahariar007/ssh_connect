@@ -51,7 +51,7 @@ public class MainActivity2 extends AppCompatActivity {
     String PASSWORD_KEY = "PASSWORD";
     String USERID_KEY = "USERID";
 
-// done
+// done gg
     String item[] = {
             "uptime -p",
             "sudo shutdown now",
