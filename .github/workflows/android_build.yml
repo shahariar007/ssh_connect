@@ -31,5 +31,13 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
           keyPassword: ${{ secrets.PASSWORD }}
+      - name: Upload AAB
+        id: uploadArtifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: app
+          path: app/release/app-release.apk
+
+
 
 
