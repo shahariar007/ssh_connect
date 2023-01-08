@@ -22,13 +22,22 @@ jobs:
 #      - name: build release
 #          run: ./gradlew bundleRelease
       - name: Sign AAB
-        id: sign
+        id: sign_app
         uses: r0adkll/sign-android-release@v1
+#        uses: shahariar007/ssh_connect@ne/actions
         with:
           releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
           keyPassword: ${{ secrets.PASSWORD }}
+      - name: Upload AAB
+        id: uploadArtifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: app
+          path: app/release/app-release.apk
+
+
 
 
