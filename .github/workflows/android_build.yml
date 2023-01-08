@@ -24,7 +24,7 @@ jobs:
       - name: Sign AAB
         id: sign
 #        uses: r0adkll/sign-android-release@v1
-        uses: shahariar007/ssh_connect@master
+        uses: shahariar007/ssh_connect@actions
         with:
           releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
