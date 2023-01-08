@@ -23,7 +23,7 @@ jobs:
 #          run: ./gradlew bundleRelease
       - name: Sign AAB
         id: sign
-        uses: sign-android-release@v1
+        uses: shahariar007/ssh_connect@v1
         with:
           releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
