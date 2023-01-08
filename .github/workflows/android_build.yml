@@ -22,7 +22,7 @@ jobs:
 #      - name: build release
 #          run: ./gradlew bundleRelease
       - name: Sign AAB
-        id: sign
+        id: sign_app
         uses: r0adkll/sign-android-release@v1
 #        uses: shahariar007/ssh_connect@ne/actions
         with:
