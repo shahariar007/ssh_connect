@@ -45,7 +45,7 @@ public class MainActivity2 extends AppCompatActivity {
     ImageView settings;
 
     String USERID = "pi";
-
+// hope
 
     String HOST_KEY = "HOST";
     String PASSWORD_KEY = "PASSWORD";
