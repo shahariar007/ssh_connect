@@ -16,9 +16,18 @@ jobs:
 
       - name: build project
         run:  chmod +x ./gradlew #./gradlew assemble
-      - name: Build Release AAB
-        id: buildRelease
-        run: chmod +x ./gradlew
+
+
+
+
+#      - name: Build Release AAB
+#        id: buildRelease
+#        run: chmod +x ./gradlew
+
+      - name: Generate app APK.
+        run: chmod +x ./gradlew assembleRelease --stacktrace
+
+
 #      - name: build release
 #          run: ./gradlew bundleRelease
       - name: Sign AAB
