@@ -50,7 +50,7 @@ jobs:
 
       - name: Deploy to play store (BETA)
         id: deploy
-        uses: r0adkll/upload-google-play@v1.0.15
+        uses: r0adkll/upload-google-play@v1
         with:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
