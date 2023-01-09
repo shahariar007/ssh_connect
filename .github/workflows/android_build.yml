@@ -20,9 +20,9 @@ jobs:
 
 
 
-#      - name: Build Release AAB
-#        id: buildRelease
-#        run: chmod +x ./gradlew
+      - name: Build Release AAB
+        id: buildRelease
+        run: chmod +x ./gradlew
 
       - name: Generate app APK.
         id: buildRelease
@@ -37,6 +37,8 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
           keyPassword: ${{ secrets.PASSWORD }}
+
+
       - name: Upload AAB
         id: uploadArtifact
         uses: actions/upload-artifact@v1
