@@ -51,7 +51,7 @@ jobs:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-         track: beta
+         track: internal
          status: inProgress
          userFraction: 0.33
 
