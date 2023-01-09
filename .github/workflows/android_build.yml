@@ -50,8 +50,8 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFile: app/release/app-release.apk
          track: beta
-         whatsNewDirectory: whatsnew/
-         mappingFile: app/build/outputs/mapping/release/mapping.txt
+         whatsNewDirectory: whatsnew/hope.txt
+    #     mappingFile: app/build/outputs/mapping/release/mapping.txt
          inAppUpdatePriority: 5
 
 
