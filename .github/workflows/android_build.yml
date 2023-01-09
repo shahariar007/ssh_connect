@@ -25,16 +25,14 @@ jobs:
 #        run: chmod +x ./gradlew
 
       - name: Generate app APK.
+        id: buildRelease
         run: ./gradlew assembleRelease --stacktrace
 
-
-#      - name: build release
-#          run: ./gradlew bundleRelease
       - name: Sign AAB
         id: sign_app
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/release
+          releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
@@ -44,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: app
-          path: app/release/app-release.apk
+          path: app/build/outputs/bundle/release/app-release.apk
 
       - name: Create service_account.json
         id: createServiceAccount
