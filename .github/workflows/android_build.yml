@@ -38,6 +38,10 @@ jobs:
           name: app
           path: app/release/app-release.apk
 
+      - name: Create service_account.json
+        id: createServiceAccount
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
 
 
 
