@@ -61,7 +61,7 @@ public class MainActivity2 extends AppCompatActivity {
             "ping",
             "sudo netstat -tunlp"
     };
-// abc
+// abcdd
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
