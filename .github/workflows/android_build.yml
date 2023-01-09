@@ -54,7 +54,7 @@ jobs:
         with:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
-         releaseFiles: app/build/outputs/apk/release/app-release.apk
+         releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: beta
          whatsNewDirectory: whatsnew/hope.txt
          inAppUpdatePriority: 5
