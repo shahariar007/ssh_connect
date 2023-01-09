@@ -26,6 +26,7 @@ jobs:
 
       - name: Generate app APK.
         run: ./gradlew assembleRelease --stacktrace
+        path: app/release
 
 
 #      - name: build release
@@ -33,7 +34,6 @@ jobs:
       - name: Sign AAB
         id: sign_app
         uses: r0adkll/sign-android-release@v1
-#        uses: shahariar007/ssh_connect@ne/actions
         with:
           releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
