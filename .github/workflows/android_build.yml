@@ -52,7 +52,7 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: internal
-         status: inProgress
+         status: draft
          userFraction: 0.33
 
 
