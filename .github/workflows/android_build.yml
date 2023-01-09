@@ -21,7 +21,7 @@ jobs:
 
 
       - name: Build Release AAB
-        id: buildRelease
+        id: buildReleaseOne
         run: chmod +x ./gradlew
 
       - name: Generate app APK.
