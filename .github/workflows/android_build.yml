@@ -26,7 +26,6 @@ jobs:
 
       - name: Generate app APK.
         run: ./gradlew assembleRelease --stacktrace
-        path: app/release
 
 
 #      - name: build release
