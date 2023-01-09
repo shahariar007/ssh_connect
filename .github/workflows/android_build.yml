@@ -11,18 +11,16 @@ jobs:
         uses: actions/setup-Java@v1
         with:
           java-version: 1.8
-#      - name: Run test
-#        run: chmod +x ./gradlew test
 
       - name: build project
         run:  chmod +x ./gradlew #./gradlew assemble
 
+      - name: build project
+        run:  ./gradlew assemble
 
-
-
-      - name: Build Release AAB
-        id: buildReleaseOne
-        run: chmod +x ./gradlew
+      #      - name: Build Release AAB
+#        id: buildReleaseOne
+#        run: chmod +x ./gradlew
 
       - name: Generate app APK.
         id: buildRelease
@@ -32,7 +30,7 @@ jobs:
         id: sign_app
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
@@ -44,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: app
-          path: app/release/app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
 
       - name: Create service_account.json
         id: createServiceAccount
@@ -56,7 +54,7 @@ jobs:
         with:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
-         releaseFile: app/release/app-release.apk
+         releaseFile: app/build/outputs/apk/release/app-release.apk
          track: beta
          whatsNewDirectory: whatsnew/hope.txt
     #     mappingFile: app/build/outputs/mapping/release/mapping.txt
