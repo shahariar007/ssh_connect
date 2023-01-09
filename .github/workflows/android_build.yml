@@ -52,6 +52,7 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: beta
+         status: inProgress
 
 
 
