@@ -16,15 +16,24 @@ jobs:
 
       - name: build project
         run:  chmod +x ./gradlew #./gradlew assemble
-      - name: Build Release AAB
-        id: buildRelease
-        run: chmod +x ./gradlew
+
+
+
+
+#      - name: Build Release AAB
+#        id: buildRelease
+#        run: chmod +x ./gradlew
+
+      - name: Generate app APK.
+        run: ./gradlew assembleRelease --stacktrace
+        path: app/release
+
+
 #      - name: build release
 #          run: ./gradlew bundleRelease
       - name: Sign AAB
         id: sign_app
         uses: r0adkll/sign-android-release@v1
-#        uses: shahariar007/ssh_connect@ne/actions
         with:
           releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
@@ -37,6 +46,23 @@ jobs:
         with:
           name: app
           path: app/release/app-release.apk
+
+      - name: Create service_account.json
+        id: createServiceAccount
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      - name: Deploy to play store (BETA)
+        id: deploy
+        uses: r0adkll/upload-google-play@v1.0.15
+        with:
+         serviceAccountJson: service_account.json
+         packageName: com.ms.timerforedtl
+         releaseFile: app/release/app-release.apk
+         track: beta
+         whatsNewDirectory: whatsnew/hope.txt
+    #     mappingFile: app/build/outputs/mapping/release/mapping.txt
+         inAppUpdatePriority: 5
+
 
 
 
