@@ -57,7 +57,7 @@ jobs:
          releaseFile: app/build/outputs/apk/release/app-release.apk
          track: beta
          whatsNewDirectory: whatsnew/hope.txt
-    #     mappingFile: app/build/outputs/mapping/release/mapping.txt
+         mappingFile: app/build/outputs/mapping/release/mapping.txt
          inAppUpdatePriority: 5
 
 
