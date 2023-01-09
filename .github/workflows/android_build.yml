@@ -42,6 +42,17 @@ jobs:
         id: createServiceAccount
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
 
+     - name: Deploy to play store (BETA)
+       id: deploy
+       uses: r0adkll/upload-google-play@v1
+       with:
+         serviceAccountJson: service_account.json
+         packageName: com.ms.timerforedtl
+         releaseFile: app/release/app-release.apk
+         track: beta
+         whatsNewDirectory: bug fixing
+
+
 
 
 
