@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     long tempEnd = 0;
     long finalTime = 0;
     long end = 0;
-// long life
+// long life ddd
     List<Long> longs = new ArrayList<>();
 
 
