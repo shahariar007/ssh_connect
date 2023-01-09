@@ -50,7 +50,7 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFile: app/release/app-release.apk
          track: beta
-         whatsNewDirectory: whatsnew/
+         whatsNewDirectory: distribution/whatsnew
 
 
 
