@@ -15,34 +15,30 @@ jobs:
       - name: build project
         run:  chmod +x ./gradlew #./gradlew assemble
 
-      - name: build project
-        run:  ./gradlew assemble
-
       #      - name: Build Release AAB
 #        id: buildReleaseOne
 #        run: chmod +x ./gradlew
 
       - name: Generate app APK.
         id: buildRelease
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew bundleRelease
 
       - name: Sign AAB
         id: sign_app
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SSH_CONNECT }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.PASSWORD }}
           keyPassword: ${{ secrets.PASSWORD }}
 
-
-      - name: Upload AAB
-        id: uploadArtifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: app
-          path: app/build/outputs/apk/release/app-release.apk
+#      - name: Upload AAB
+#        id: uploadArtifact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: app
+#          path: app/build/outputs/bundle/release/app-release.aab
 
       - name: Create service_account.json
         id: createServiceAccount
@@ -50,14 +46,15 @@ jobs:
 
       - name: Deploy to play store (BETA)
         id: deploy
-        uses: r0adkll/upload-google-play@v1.0.15
+        uses: r0adkll/upload-google-play@v1
         with:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
-         releaseFile: app/build/outputs/apk/release/app-release.apk
-         track: beta
-         whatsNewDirectory: whatsnew/hope.txt
-         inAppUpdatePriority: 5
+         releaseFiles: app/build/outputs/bundle/release/app-release.aab
+         track: internal
+         status: draft
+         userFraction: 0.50
+         whatsNewDirectory: app/whatsnew/
 
 
 
