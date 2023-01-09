@@ -52,7 +52,7 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: beta
-         whatsNewDirectory: whatsnew/hope.txt
+        # whatsNewDirectory: whatsnew/hope.txt
          inAppUpdatePriority: 5
 
 
