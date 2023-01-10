@@ -19,6 +19,11 @@ jobs:
 #        id: buildReleaseOne
 #        run: chmod +x ./gradlew
 
+
+      - name: Unit tests
+        id: tests
+        run: ./gradlew test
+
       - name: Generate app APK.
         id: buildRelease
         run: ./gradlew bundleRelease
