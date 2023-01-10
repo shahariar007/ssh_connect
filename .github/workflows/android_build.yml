@@ -19,6 +19,11 @@ jobs:
 #        id: buildReleaseOne
 #        run: chmod +x ./gradlew
 
+
+      - name: Unit tests
+        id: tests
+        run: ./gradlew test
+
       - name: Generate app APK.
         id: buildRelease
         run: ./gradlew bundleRelease
@@ -46,14 +51,14 @@ jobs:
 
       - name: Deploy to play store (BETA)
         id: deploy
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.0.19
         with:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: internal
          status: draft
-         userFraction: 0.50
+      #   userFraction: 0.50
          whatsNewDirectory: app/whatsnew/
 
 
