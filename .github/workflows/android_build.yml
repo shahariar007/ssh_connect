@@ -52,7 +52,7 @@ jobs:
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: alpha
-         status: completed
+         status: inProgress
          userFraction: 0.50
          whatsNewDirectory: app/whatsnew/
 
