@@ -51,8 +51,8 @@ jobs:
          serviceAccountJson: service_account.json
          packageName: com.ms.timerforedtl
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-         track: internal
-         status: draft
+         track: beta
+         status: completed
        #  userFraction: 0.50
          whatsNewDirectory: app/whatsnew/
 
