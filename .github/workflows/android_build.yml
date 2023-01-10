@@ -53,7 +53,7 @@ jobs:
          releaseFiles: app/build/outputs/bundle/release/app-release.aab
          track: internal
          status: draft
-         userFraction: 0.50
+       #  userFraction: 0.50
          whatsNewDirectory: app/whatsnew/
 
 
